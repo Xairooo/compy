@@ -38,6 +38,8 @@ func main() {
 	if (*cert == "") != (*key == "") {
 		log.Fatalln("must specify both certificate and key")
 	}
+	p.Cert = cert
+	p.Key = key
 
 	if *ca != "" {
 		if err := p.EnableMitm(*ca, *caKey); err != nil {
@@ -81,6 +83,7 @@ func main() {
 	}()
 
 	log.Printf("compy listening on %s", *host)
+	p.Host = *host
 
 	var err error
 	if *cert != "" {

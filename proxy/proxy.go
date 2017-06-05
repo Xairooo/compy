@@ -2,9 +2,11 @@ package proxy
 
 import (
 	"fmt"
+	"io"
 	"log"
 	"net"
 	"net/http"
+	"os"
 	"sync/atomic"
 )
 
@@ -13,6 +15,9 @@ type Proxy struct {
 	ml          *mitmListener
 	ReadCount   uint64
 	WriteCount  uint64
+	Host        string
+	Cert        *string
+	Key         *string
 }
 
 type Transcoder interface {
@@ -41,6 +46,7 @@ func (p *Proxy) AddTranscoder(contentType string, transcoder Transcoder) {
 	p.transcoders[contentType] = transcoder
 }
 
+// TODO: simplify this and following functions with p.Cert and p.Key?
 func (p *Proxy) Start(host string) error {
 	return http.ListenAndServe(host, p)
 }
@@ -60,6 +66,37 @@ func (p *Proxy) handle(w http.ResponseWriter, r *http.Request) error {
 	if r.Method == "CONNECT" {
 		return p.handleConnect(w, r)
 	}
+	// TODO: why does r.URL.Host not include the port?
+	if r.URL.Host == "" {
+		if r.Method == "GET" && r.URL.Path == "/" {
+			// TODO: return usage, version, and link to CA certificate
+			read := atomic.LoadUint64(&p.ReadCount)
+			written := atomic.LoadUint64(&p.WriteCount)
+			io.WriteString(w, fmt.Sprintf("total transcoded: %d -> %d (%3.1f%%)\n",
+				read, written, float64(written)/float64(read)*100))
+			return nil
+		} else if r.Method == "GET" && r.URL.Path == "/cert" {
+			if p.Cert == nil {
+				w.WriteHeader(http.StatusNotFound)
+				return nil
+			}
+
+			w.Header().Set("Content-Type", "application/x-x509-ca-cert")
+			file, err := os.OpenFile(*p.Cert, os.O_RDONLY, 0)
+			if err != nil {
+				return err
+			}
+			defer file.Close()
+			if _, err := io.Copy(w, file); err != nil {
+				return err
+			}
+		} else {
+			w.WriteHeader(http.StatusNotFound)
+			return nil
+		}
+		return nil
+	}
+
 	resp, err := forward(r)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
