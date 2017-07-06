@@ -63,11 +63,15 @@ func (p *Proxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func (p *Proxy) handle(w http.ResponseWriter, r *http.Request) error {
+	// TODO: remove
+	fmt.Printf("gaul: url: %+v\n", *r.URL)
+	fmt.Printf("gaul: host: %+v\n", p.Host)
 	if r.Method == "CONNECT" {
 		return p.handleConnect(w, r)
 	}
 	// TODO: why does r.URL.Host not include the port?
-	if r.URL.Host == "" {
+	// TODO: something odd going on with port between HTTP and HTTPS
+	if r.URL.Host == p.Host {
 		if r.Method == "GET" && r.URL.Path == "/" {
 			// TODO: return usage, version, and link to CA certificate
 			read := atomic.LoadUint64(&p.ReadCount)
