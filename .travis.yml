@@ -1,8 +1,23 @@
 language: go
 sudo: required
 dist: trusty
+env:
+  global:
+    - secure: "f4AtGhOe9r7v+Ao6+yYcPUISb4QvGRr0M4zRLSTpQb6lHYgDCJZxCfTRKtUcr915dlro0UFMT8MwRloYiqR02TcW21g8sqC3JAWiPGMOYjz9VQUQKyw8UeQCbD224YwP/IhvGbG1OTgUdhtapnZ5kWQdoJBd0m9DNTZnFEtLmQeNhyt/J0nE3kPt9wpXFBT0MpUG5domhgkiMI/7XZI9+bXiRgnGNeCQKLpSDO1nAodTOcODZRDl0v0St+xIPUBtQUjhS1Pbi73JGQqy/h68cwuldgVvFhMLv0FzdIQY7RjIEJuzIcGSAC5Lm8az6xiKu5dfR37/Tty2LIoH1boudk2WTO7vqTwfNFTUyOwLtxmg4MGa3ZlsGR2gjVUjAXLvnvCa1qYwH7WsNnMtOgsJ8n+pHmtxHfYWETpS66SkCBIoHPli5C9t6vMt5yN8tS65sokConay50mP2K7ngUfKdO6U7BQTTWPuYpgSS8y6CFbxmJV/mYABOeyaRp/e2Pg3VKQsBWU83aHWFhpgOBgowNVTM09sMtRvyqEQMEfK0OCO7H40Y6/7mKnRH2OdaNMH2kFm04MzhLpfrbJbfaCP1pXFrwwG03+o05AnCPu1noLwxJJzkx3jOMa+MbBKo+fClZUwpOpMpOYs1nhPE3pZ0x6AsNUXja7ORPxECSXlJUY="  # DOCKER_USER
+    - secure: "mli6d9Vl3IYiiGCMbtA3Cy0Xp6JBo4DXDEKEJ6yDT5baCTeqXX0jArwwk6KH/OYMql0/wqdu1zdWoHfwEItnJdy9lDn7xuAzcs3lynAIWokpyvXQEerwLpqeXZUQREtlmGnmQ63uWz8xL6xfCJo4Xze+GugTK+PAOWEsjZ+B5SzDXf0IvGNsCIx9HMl83B3Judn0SUtlGroYOS9aQ1VUk4QVV4vZI0mQG4RlWSSGV3wwTIfxTiABqf0nNiByaL719Yy+ZvaPRIovRtl2tx1RR21Kexg3ffyf8g39mCXbeDnhCibto4xh3kopYBrZOpJxMVVtheVUbcVG+pzGpKLenql3XU8D6+bBJr1FC2yvCYJrPfauGjQWg9+aISG65/yCuNKiF6H+YpdaOYLTyG5e6ItWwUumGAUslA3JA281oFJzMCGLsAwtZ3jVoWjAxO+kHX6YqG8Ci/BkvxYws5Ft9frbvbiHkzodKT2oNZN9WRucoA6gQBDhmeepX0TGVEiDcqTvGG7Ik7SlP2WTG6S47hKJs4Z/buI85hSbq6EzCgwsdj5DWHZRS+h6DZYfqsfxNWnhP4LGK8gLAeIQLosE0mP4MgxIL1xD3xRom3DnYgbZsJO+yhGSuPklk/eAhgotEEbaqVjg8fAvxv7Dr4E9eh7h5moeDHic/PwB147Zhg8="  # DOCKER_PASS
+    - COMMIT=${TRAVIS_COMMIT::8}
 install:
   - go get -t
   - go build
 go:
   - 1.8.1
+services:
+  - docker
+after_success:
+  - docker login -u $DOCKER_USER -p $DOCKER_PASS
+  - export REPO=andrewgaul/compy
+  - export TAG=`if [ "$TRAVIS_BRANCH" == "master" ]; then echo "latest"; else echo $TRAVIS_BRANCH ; fi`
+  - docker build -f Dockerfile -t $REPO:$COMMIT .
+  - docker tag $REPO:$COMMIT $REPO:$TAG
+  - docker tag $REPO:$COMMIT $REPO:travis-$TRAVIS_BUILD_NUMBER
+  - docker push $REPO
