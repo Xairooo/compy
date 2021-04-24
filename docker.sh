@@ -2,7 +2,7 @@
 
 if [ -n "${CERT_GENERATE}" ] || [ -r /opt/compy/ssl/cert.crt ] ; then
 echo "Generating server certificate"
-openssl req -x509 -newkey rsa:2048 -nodes -keyout cert.key -out cert.crt -days 3650 -subj "/CN=${CERT_DOMAIN}"
+openssl req -x509 -newkey rsa:2048 -nodes -keyout ./ssl/cert.key -out ./ssl/cert.crt -days 3650 -subj "/CN=${CERT_DOMAIN}"
 echo Done
 CERT_FROM=Generated
 else
@@ -11,7 +11,7 @@ fi
 
 if [ -n "${CA_GENERATE}" ] || [ -r /opt/compy/ssl/ca.crt ] ; then
 echo "Generating CA certificate"
-openssl req -x509 -newkey rsa:2048 -nodes -keyout ca.key -out ca.crt -days 3650 -subj "/CN=${CA_DOMAIN}"
+openssl req -x509 -newkey rsa:2048 -nodes -keyout ./ssl/ca.key -out ./ssl/ca.crt -days 3650 -subj "/CN=${CA_DOMAIN}"
 echo Done
 CA_FROM=Generated
 else
