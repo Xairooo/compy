@@ -39,9 +39,7 @@ COPY \
     /opt/compy/
 
 # TODO: configure HTTP BASIC authentication
-# TODO: user-provided certificates
-ENV \
-    CERTIFICATE_DOMAIN="localhost"
-
+# TODO: --user-provided certificates-- Solved
+VOLUME ["/opt/compy/ssl"]
 EXPOSE 9999
 ENTRYPOINT ["./docker.sh"]
