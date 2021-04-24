@@ -1,4 +1,4 @@
-FROM ubuntu:16.04 as compy-builder
+FROM golang:latest as compy-builder
 MAINTAINER Barna Csorogi <barnacs@justletit.be>
 
 RUN DEBIAN_FRONTEND=noninteractive apt-get update && \
@@ -7,19 +7,23 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get update && \
         curl \
         g++ \
         git \
-        libjpeg8-dev
+        libjpeg-dev
 
-RUN mkdir -p /usr/local/ && \
-    curl -O https://storage.googleapis.com/golang/go1.9.linux-amd64.tar.gz && \
-    tar xf go1.9.linux-amd64.tar.gz -C /usr/local
+#RUN mkdir -p /usr/local/ && \
+#    curl -O https://storage.googleapis.com/golang/go1.9.linux-amd64.tar.gz && \
+#    tar xf go1.9.linux-amd64.tar.gz -C /usr/local
 
-RUN mkdir -p /go/src/github.com/barnacs/compy/
-COPY . /go/src/github.com/barnacs/compy/
+#RUN mkdir -p /go/src/github.com/barnacs/compy/
+#COPY . /go/src/github.com/barnacs/compy/
+#WORKDIR /go/src/github.com/barnacs/compy
+#RUN /usr/local/go/bin/go get -d -v ./...
+#RUN /usr/local/go/bin/go build -v
+
+RUN go get github.com/barnacs/compy
 WORKDIR /go/src/github.com/barnacs/compy
-RUN /usr/local/go/bin/go get -d -v ./...
-RUN /usr/local/go/bin/go build -v
+#RUN go install
 
-FROM ubuntu:16.04
+FROM ubuntu:20.04
 MAINTAINER Barna Csorogi <barnacs@justletit.be>
 
 RUN DEBIAN_FRONTEND=noninteractive apt-get update && \
@@ -34,12 +38,14 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get update && \
 WORKDIR /opt/compy
 COPY \
     --from=compy-builder \
-    /go/src/github.com/barnacs/compy/compy \
-    /go/src/github.com/barnacs/compy/docker.sh \
+    /go/bin/compy \
     /opt/compy/
-
+COPY \
+    ./docker.sh \
+    /opt/compy/
+    
 # TODO: configure HTTP BASIC authentication
 # TODO: --user-provided certificates-- Solved
-VOLUME ["/opt/compy/ssl"]
+VOLUME ["opt/compy/ssl"]
 EXPOSE 9999
 ENTRYPOINT ["./docker.sh"]
