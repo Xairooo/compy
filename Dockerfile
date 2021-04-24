@@ -49,6 +49,6 @@ COPY \
 ENV \
     CERTIFICATE_DOMAIN="localhost"
 
-VOLUME ["opt/compy/ssl"]
+VOLUME ["/opt/compy/ssl"]
 EXPOSE 9999
 ENTRYPOINT ["./docker.sh"]
