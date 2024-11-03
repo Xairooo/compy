@@ -1,35 +1,27 @@
-FROM golang:latest as compy-builder
+FROM ubuntu:22.04 AS compy-builder
 MAINTAINER Barna Csorogi <barnacs@justletit.be>
 
+WORKDIR /go/src/github.com/barnacs/compy
+COPY . .
 RUN DEBIAN_FRONTEND=noninteractive apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get upgrade -y && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y \
+        golang-go \
         curl \
         g++ \
         git \
-        libjpeg-dev
+        libjpeg \
+        libjpeg-dev && \
+    go build -v -o compy
 
-#RUN mkdir -p /usr/local/ && \
-#    curl -O https://storage.googleapis.com/golang/go1.9.linux-amd64.tar.gz && \
-#    tar xf go1.9.linux-amd64.tar.gz -C /usr/local
-
-#RUN mkdir -p /go/src/github.com/barnacs/compy/
-#COPY . /go/src/github.com/barnacs/compy/
-#WORKDIR /go/src/github.com/barnacs/compy
-#RUN /usr/local/go/bin/go get -d -v ./...
-#RUN /usr/local/go/bin/go build -v
-
-RUN go get github.com/barnacs/compy
-WORKDIR /go/src/github.com/barnacs/compy
-#RUN go install
-
-FROM ubuntu:20.04
+FROM ubuntu:22.04
 MAINTAINER Barna Csorogi <barnacs@justletit.be>
 
 RUN DEBIAN_FRONTEND=noninteractive apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get upgrade -y && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y \
-        libjpeg8 \
+        libjpeg \
+        libjpeg-dev \
         openssl \
         ssl-cert && \
     DEBIAN_FRONTEND=noninteractive apt-get clean && \
