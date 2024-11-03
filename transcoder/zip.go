@@ -2,7 +2,7 @@ package transcoder
 
 import (
 	"compress/gzip"
-	"github.com/barnacs/compy/proxy"
+	"github.com/Xairooo/compy/proxy"
 	brotlienc "gopkg.in/kothar/brotli-go.v0/enc"
 	"net/http"
 	"strings"

@@ -3,8 +3,8 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/barnacs/compy/proxy"
-	tc "github.com/barnacs/compy/transcoder"
+	"github.com/Xairooo/compy/proxy"
+	tc "github.com/Xairooo/compy/transcoder"
 	"log"
 	"os"
 	"os/signal"

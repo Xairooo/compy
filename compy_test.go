@@ -15,9 +15,9 @@ import (
 	"net/url"
 	"testing"
 
+	"github.com/Xairooo/compy/proxy"
+	tc "github.com/Xairooo/compy/transcoder"
 	"github.com/ahmetalpbalkan/go-httpbin"
-	"github.com/barnacs/compy/proxy"
-	tc "github.com/barnacs/compy/transcoder"
 	"github.com/chai2010/webp"
 	brotlidec "gopkg.in/kothar/brotli-go.v0/dec"
 )

@@ -1,7 +1,7 @@
 FROM ubuntu:22.04 AS compy-builder
 MAINTAINER Barna Csorogi <barnacs@justletit.be>
 
-WORKDIR /go/src/github.com/barnacs/compy
+WORKDIR /compy
 COPY . .
 RUN DEBIAN_FRONTEND=noninteractive apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get upgrade -y && \
@@ -12,6 +12,8 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get update && \
         git \
         libjpeg9 \
         libjpeg9-dev && \
+    go mod init github.com/Xairooo/compy && \
+    go mod tidy && \
     go build -v -o compy
 
 FROM ubuntu:22.04
@@ -28,13 +30,8 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 WORKDIR /opt/compy
-COPY \
-    --from=compy-builder \
-    /go/bin/compy \
-    /opt/compy/
-COPY \
-    ./docker.sh \
-    /opt/compy/
+COPY --from=compy-builder /compy/compy .
+COPY ./docker.sh .
     
 # TODO: configure HTTP BASIC authentication
 # TODO: --user-provided certificates-- Solved
