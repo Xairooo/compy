@@ -10,8 +10,8 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get update && \
         curl \
         g++ \
         git \
-        libjpeg \
-        libjpeg-dev && \
+        libjpeg9 \
+        libjpeg9-dev && \
     go build -v -o compy
 
 FROM ubuntu:22.04
@@ -20,8 +20,8 @@ MAINTAINER Barna Csorogi <barnacs@justletit.be>
 RUN DEBIAN_FRONTEND=noninteractive apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get upgrade -y && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y \
-        libjpeg \
-        libjpeg-dev \
+        libjpeg9 \
+        libjpeg9-dev \
         openssl \
         ssl-cert && \
     DEBIAN_FRONTEND=noninteractive apt-get clean && \
